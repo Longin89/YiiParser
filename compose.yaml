@@ -57,8 +57,3 @@ networks:
 
 volumes:
   db:
-
-php yii logs/load /var/www/modimio.access.log
-
-php yii logs/clear    # очистить таблицу
-php yii logs/load <путь к файлу логов>   # загрузить заново
