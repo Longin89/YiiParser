@@ -1,0 +1,64 @@
+services:
+  nginx:
+    container_name: yii_nginx
+    image: nginx:latest
+    ports:
+      - 80:80
+    volumes:
+      - ./www:/var/www
+      - ./vhost.conf:/etc/nginx/conf.d/default.conf
+    networks:
+      - yii
+    depends_on:
+      - php
+
+  php:
+    container_name: yii_php
+    build: ./images/php81fpm
+    volumes:
+      - ./www:/var/www
+      - ./php.ini:/usr/local/etc/php/conf.d/php.ini
+    networks:
+      - yii
+    depends_on:
+      - mysql
+
+  mysql:
+    container_name: yii_mysql
+    image: mysql:8.0
+    volumes:
+      - ./www:/var/www
+      - ./my.cnf:/etc/mysql/conf.d/my.cnf
+      - db:/var/lib/mysql
+    environment:
+      - MYSQL_USER=yii
+      - MYSQL_PASSWORD=yii
+      - MYSQL_ROOT_PASSWORD=yii
+      - MYSQL_DATABASE=yii
+    networks:
+      - yii
+
+  phpmyadmin:
+    container_name: phpmyadmin
+    image: phpmyadmin/phpmyadmin:latest
+    ports:
+      - "8080:80"
+    environment:
+      PMA_HOST: mysql
+      PMA_USER: yii
+      PMA_PASSWORD: yii
+    networks:
+      - yii
+    depends_on:
+      - mysql
+
+networks:
+  yii:
+
+volumes:
+  db:
+
+php yii logs/load /var/www/modimio.access.log
+
+php yii logs/clear    # очистить таблицу
+php yii logs/load <путь к файлу логов>   # загрузить заново
